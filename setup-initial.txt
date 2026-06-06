@@ -1,0 +1,508 @@
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+INSTALLING OLLAMA
+
+
+https://ollama.com/download/linux
+
+curl -fsSL https://ollama.com/install.sh | sh
+
+
+>>> Installing ollama to /usr/local
+[sudo] senha para wolf: 
+>>> Downloading ollama-linux-amd64.tar.zst
+######################################################################## 100.0%
+>>> Creating ollama user...
+>>> Adding ollama user to render group...
+>>> Adding ollama user to video group...
+>>> Adding current user to ollama group...
+>>> Creating ollama systemd service...
+>>> Enabling and starting ollama service...
+Created symlink /etc/systemd/system/default.target.wants/ollama.service → /etc/systemd/system/ollama.service.
+>>> The Ollama API is now available at 127.0.0.1:11434.
+>>> Install complete. Run "ollama" from the command line.
+WARNING: No NVIDIA/AMD GPU detected. Ollama will run in CPU-only mode.
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+which ollama
+/usr/local/bin/ollama
+wolf@base:~/Documentos/lab-artificial-inteligence$ whereis ollama
+ollama: /usr/local/bin/ollama /usr/local/lib/ollama /usr/share/ollama
+
+
+ollama --version
+ollama version is 0.30.5
+
+
+ollama
+Ollama 0.30.5                                           
+                                                        
+  Chat with a model                                     
+    Start an interactive chat with a model              
+                                                        
+  Launch Claude Code                                    
+    Anthropic's coding tool with subagents              
+                                                        
+  Launch Hermes Agent (install)                         
+    Self-improving AI agent built by Nous Research      
+                                                        
+  Launch OpenClaw (install)                             
+    Personal AI with 100+ skills                        
+                                                        
+  Launch OpenCode (not installed)                       
+    Anomaly's open-source coding agent                  
+                                                        
+  Launch Hermes Desktop (install)                       
+    Desktop app for Hermes Agent by Nous Research       
+                                                        
+  Launch Codex                                          
+    OpenAI's open-source coding agent                   
+                                                        
+  Launch Copilot CLI (not installed)                    
+    GitHub's AI coding agent for the terminal           
+                                                        
+  Launch Cline (install)                                
+    Autonomous coding agent with parallel execution     
+                                                        
+  Launch Droid (not installed)                          
+    Factory's coding agent across terminal and IDEs     
+                                                        
+  Launch Pi (install)                                   
+    Minimal AI agent toolkit with plugin support        
+                                                        
+  Launch Pool (not installed)                           
+    Poolside's software agent for enterprise development
+                                                        
+▸ Launch Qwen Code (install)                            
+    Press enter to install                              
+                                                        
+                                                        
+↑/↓ navigate • enter launch • → configure • esc quit 
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+QWEN DOWNLOAD
+
+
+---
+
+
+Qwen 3.5 4B
+
+Para:
+
+desenvolvimento diário
+testes rápidos
+criação de agentes
+depuração
+
+Consome menos recursos.
+
+
+ollama pull qwen3.5:4b
+
+
+---
+
+
+Qwen 3.5 9B
+
+Para:
+
+avaliações reais
+RAG
+testes finais
+documentos maiores
+
+Maior qualidade.
+
+ollama pull qwen3.5:9b
+
+
+---
+
+
+O que eu faria na prática?
+
+Eu manteria ambos instalados.
+
+Quando estivesse desenvolvendo:
+
+ollama run qwen3.5:4b
+
+Quando estivesse validando:
+
+ollama run qwen3.5:9b
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+ollama list
+
+ollama run qwen3.5:4b
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+lista dos mais usados e uteis comando ollama
+
+
+ollama --version
+
+ollama -v
+
+ollama list
+
+ollama run qwen3.5:4b
+
+ollama pull qwen3.5:4b
+
+ollama rm qwen3.5:4b
+
+ollama show qwen3.5:9b
+
+ollama ps
+
+ollama stop qwen3.5:9b
+
+ollama cp qwen3.5:9b meu-qwen
+
+ollama cp qwen3.5:9b projeto-rag
+
+ollama create meu-modelo -f Modelfile
+
+ollama serve     # Normalmente já inicia automaticamente.
+
+http://localhost:11434
+
+curl http://localhost:11434/api/tags
+
+
+# Gerar texto via API
+
+curl http://localhost:11434/api/generate \
+-d '{
+  "model":"qwen3.5:9b",
+  "prompt":"Explique Kafka"
+}'
+
+
+
+# Gerar embeddings
+
+curl http://localhost:11434/api/embed \
+-d '{
+  "model":"qwen3.5:9b",
+  "input":"Kubernetes é uma plataforma de orquestração."
+}'
+
+
+
+# Verificar saúde da API
+
+curl http://localhost:11434
+
+
+
+# Conversar sem entrar no modo interativo
+
+ollama run qwen3.5:9b "Explique Docker"
+
+
+
+# Comandos internos durante o chat
+# Quando estiver dentro de:
+
+ollama run qwen3.5:9b
+
+você pode usar:
+
+Sair
+/bye
+
+ou
+
+/exit
+Limpar contexto
+/clear
+
+Inicia uma conversa nova.
+
+Ajuda
+/help
+
+Lista os comandos disponíveis naquela versão
+
+
+
+# Com apenas esses comandos você já consegue administrar praticamente todo o seu laboratório local baseado em:
+
+Ollama
+  ↓
+Qwen
+  ↓
+LangChain
+  ↓
+LangGraph
+  ↓
+Qdrant
+
+que é exatamente a fundação da plataforma de IA corporativa que você vem planejando.
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+
+ollama show qwen3.5:4b
+  Model
+    architecture        qwen35    
+    parameters          4.7B      
+    context length      262144    
+    embedding length    2560      
+    quantization        Q4_K_M    
+    requires            0.17.1    
+
+  Capabilities
+    completion    
+    vision        
+    tools         
+    thinking      
+
+  Parameters
+    temperature         1       
+    top_k               20      
+    top_p               0.95    
+    presence_penalty    1.5     
+
+  License
+    Apache License               
+    Version 2.0, January 2004    
+    ...                          
+
+
+
+
+
+
+
+Perfeito. Agora descobrimos o motivo.
+
+Veja esta parte:
+
+Capabilities
+  completion
+  vision
+  tools
+  thinking
+
+O culpado é exatamente:
+
+thinking
+
+Você não baixou apenas um modelo conversacional.
+
+Você baixou um modelo com capacidade explícita de raciocínio.
+
+Por isso ele faz:
+
+Thinking...
+Thinking Process:
+...
+
+antes de responder.
+
+O que isso significa?
+
+O modelo tenta:
+
+Interpretar a pergunta.
+Planejar uma resposta.
+Avaliar ambiguidades.
+Só depois responder.
+
+É parecido com a diferença entre:
+
+GPT tradicional
+
+e
+
+Modelos Reasoning
+
+que raciocinam antes de responder.
+
+Para o projeto isso é bom?
+
+Na maioria dos casos:
+
+sim.
+
+Para:
+
+agentes
+RAG
+planejamento
+tomada de decisão
+workflows LangGraph
+
+isso costuma melhorar os resultados.
+
+Para conversar no terminal?
+
+Pode ser irritante.
+
+Especialmente quando você quer:
+
+Pergunta
+↓
+Resposta
+
+e recebe:
+
+Pergunta
+↓
+Thinking...
+↓
+Thinking Process...
+↓
+Resposta
+
+
+
+
+
+
+
+
+
+O que eu suspeito que esteja acontecendo
+
+A equipe do Ollama lançou o Qwen 3.5 com:
+
+vision
++
+tools
++
+thinking
+
+ativados por padrão.
+
+Isso é excelente para:
+
+agentes
+MCP
+automação
+workflows complexos
+
+Mas não é a experiência mais agradável para um chatbot simples.
+
+Minha recomendação para você
+
+Como você está montando um laboratório para:
+
+Ollama
++
+Qwen
++
+LangChain
++
+LangGraph
++
+Qdrant
+
+eu manteria exatamente o modelo que você baixou.
+
+Não removeria.
+
+Porque quando você começar a construir:
+
+Supervisor Agent
+Planner Agent
+Research Agent
+Tool Calling
+
+a capacidade de thinking provavelmente será uma vantagem.
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+ollama pull llama3.1:8b
+
+ollama pull llama3.2:3b
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+time ollama run llama3.2:3b "Qual a capital da França? ***ATENÇÃO: responda de forma direta com somente uma palavra***
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
