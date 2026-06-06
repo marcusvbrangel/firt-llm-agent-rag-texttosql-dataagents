@@ -1,0 +1,48 @@
+
+V1
+------------------
+Schema
+Text-to-SQL
+Execution
+Response
+
+V2
+------------------
+Schema
+Text-to-SQL
+SQL Validator
+Execution
+Response
+
+V3
+------------------
+Schema
+Text-to-SQL
+SQL Validator
+Execution
+Analytics
+
+V4
+------------------
+Schema
+Text-to-SQL
+SQL Validator
+Execution
+Analytics
+Memory
+
+V5
+------------------
+Schema
+Text-to-SQL
+SQL Validator
+Execution
+Analytics
+Memory
+LangSmith
+
+V6
+------------------
+LangGraph Multi-Agent
+
+
