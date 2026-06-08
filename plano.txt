@@ -70,6 +70,16 @@ para execução local.... qual o modelo com o melhor custo beneficio (performanc
 
 
 
+----------------------------------------------
+
+o foco técnico amanhã deve ser:
+
+latência por consulta;
+qualidade do SQL gerado;
+robustez contra perguntas fora do schema;
+tratamento claro de erro;
+exibição transparente de pergunta, SQL, resultado e resposta final.
+
 
 
 
