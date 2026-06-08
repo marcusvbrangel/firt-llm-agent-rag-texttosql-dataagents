@@ -194,3 +194,19 @@ e mais passo a passo, evitando comando dentro de comando
 
 
 --------------------------------------
+
+como já temos o arquivo de dados do banco sqllite volve_ml_ready.db
+já criado na pasta....  não precisamos mais de codigos para ler
+arquivo volve-field-daily-data.xlsx  e gerar novamente o banco sqllite,
+remomas estas instruções que nao sao mais necessaria.... agora nossa
+origem de dados vem direto do sqllite volve_ml_ready.db.... o que voce
+acha?
+
+
+--------------------------------------
+
+
+
+
+
+--------------------------------------

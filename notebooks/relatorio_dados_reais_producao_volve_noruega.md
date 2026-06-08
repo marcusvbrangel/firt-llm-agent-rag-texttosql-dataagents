@@ -1,6 +1,6 @@
 # Relatório Executivo - Dados Reais de Produção Volve (Noruega)
 
-**Data da Execução:** 2026-06-08 02:45:43
+**Data da Execução:** 2026-06-08 20:07:37
 
 **Fonte de Dados CSV:** volve_ml_ready.csv
 **Banco SQLite:** volve_ml_ready.db
@@ -106,72 +106,73 @@ COLUNAS DISPONIVEIS NESTA TABELA:
 ## 3. Histórico de Execuções e Respostas Técnicas
 
 ### Caso de Teste 1: Em qual data ocorreu o maior BORE_OIL_VOL e qual foi o valor?
-- Tempo Total: 54.65 segundos
-- Tempo de Geração do SQL: 47.68 segundos
+- Tempo Total: 4.65 segundos
+- Tempo de Geração do SQL: 0.00 segundos
 - Tempo de Execução SQL: 0.00 segundos
-- Tempo de Resposta Remota: 6.95 segundos
-- Tamanho do Prompt Local Enviado: 22664 caracteres
-- Tamanho do Prompt Remoto Enviado: 20770 caracteres
+- Tempo de Resposta Remota: 4.63 segundos
+- Tamanho do Prompt Local Enviado: 0 caracteres
+- Tamanho do Prompt Remoto Enviado: 1464 caracteres
 - Tentativas de Correção (Retries): 0
 - Status: Sem erros
 
 ```sql
-SELECT DATEPRD, MAX(BORE_OIL_VOL) AS max_oil_volume FROM volve_ml_ready ORDER BY BORE_OIL_VOL DESC LIMIT 1
+SELECT DATEPRD, BORE_OIL_VOL FROM volve_ml_ready ORDER BY BORE_OIL_VOL DESC LIMIT 1
 ```
 
 ```text
-   DATEPRD  max_oil_volume
-2014-06-13          818.89
+   DATEPRD  BORE_OIL_VOL
+2014-06-13        818.89
 ```
 
-> ## Pico de Produção de Óleo — BORE_OIL_VOL
+> ## Maior Volume Diário de Óleo Produzido
 
-O maior volume diário de óleo produzido registrado na série histórica ocorreu em:
+| DATEPRD | BORE_OIL_VOL |
+|------------|--------------|
+| 2014-06-13 | 818,89 Sm³/d |
 
-- **DATEPRD:** `2014-06-13`
-- **BORE_OIL_VOL (max_oil_volume):** `818,89 Sm³/d`
-
-Este valor representa o pico de produção diária de óleo do poço, medido na linha de produção via medidor multifásico/teste de produção, expresso em metros cúbicos padrão por dia (Sm³/d).
+O maior **BORE_OIL_VOL** registrado ocorreu em **13 de junho de 2014**, com um volume diário de óleo produzido de **818,89 Sm³/d**.
 
 ---
 
 ### Caso de Teste 2: Em qual data ocorreu o maior BORE_WAT_VOL e qual foi o valor?
-- Tempo Total: 45.10 segundos
-- Tempo de Geração do SQL: 39.60 segundos
+- Tempo Total: 3.13 segundos
+- Tempo de Geração do SQL: 0.00 segundos
 - Tempo de Execução SQL: 0.00 segundos
-- Tempo de Resposta Remota: 5.49 segundos
-- Tamanho do Prompt Local Enviado: 22664 caracteres
-- Tamanho do Prompt Remoto Enviado: 20776 caracteres
+- Tempo de Resposta Remota: 3.12 segundos
+- Tamanho do Prompt Local Enviado: 0 caracteres
+- Tamanho do Prompt Remoto Enviado: 1464 caracteres
 - Tentativas de Correção (Retries): 0
 - Status: Sem erros
 
 ```sql
-SELECT DATEPRD, MAX(BORE_WAT_VOL) AS max_water_volume FROM volve_ml_ready ORDER BY BORE_WAT_VOL DESC LIMIT 1
+SELECT DATEPRD, BORE_WAT_VOL FROM volve_ml_ready ORDER BY BORE_WAT_VOL DESC LIMIT 1
 ```
 
 ```text
-   DATEPRD  max_water_volume
-2015-06-26            765.45
+   DATEPRD  BORE_WAT_VOL
+2015-06-26        765.45
 ```
 
-> ## Maior Volume Diário de Água Produzida (BORE_WAT_VOL)
+> ## Maior Volume Diário de Água Produzida
 
-O pico de produção de água registrado no histórico do poço ocorreu em:
+O maior **BORE_WAT_VOL** registrado ocorreu em:
 
-- **DATEPRD:** `2015-06-26`
-- **BORE_WAT_VOL (max_water_volume):** `765,45 Sm³/d`
+| DATEPRD | BORE_WAT_VOL |
+|------------|--------------|
+| 2015-06-26 | **765,45 Sm³/d** |
 
-Este valor representa o maior volume diário de água produzida (BORE_WAT_VOL) medido na linha de produção/separador ao longo de toda a série temporal disponível na tabela `volve_ml_ready`.
+**Data:** 26 de junho de 2015
+**Volume de água produzida:** **765,45 Sm³/d**
 
 ---
 
 ### Caso de Teste 3: Qual foi a média de ON_STREAM_HRS?
-- Tempo Total: 38.11 segundos
-- Tempo de Geração do SQL: 33.38 segundos
-- Tempo de Execução SQL: 0.00 segundos
-- Tempo de Resposta Remota: 4.70 segundos
-- Tamanho do Prompt Local Enviado: 22637 caracteres
-- Tamanho do Prompt Remoto Enviado: 20591 caracteres
+- Tempo Total: 5.39 segundos
+- Tempo de Geração do SQL: 0.00 segundos
+- Tempo de Execução SQL: 0.01 segundos
+- Tempo de Resposta Remota: 5.36 segundos
+- Tamanho do Prompt Local Enviado: 0 caracteres
+- Tamanho do Prompt Remoto Enviado: 1339 caracteres
 - Tentativas de Correção (Retries): 0
 - Status: Sem erros
 
@@ -184,94 +185,112 @@ SELECT AVG(ON_STREAM_HRS) AS avg_on_stream_hrs FROM volve_ml_ready
            23.6488
 ```
 
-> ## Média de ON_STREAM_HRS
+> ## Média de Horas em Operação (ON_STREAM_HRS)
 
-A média de **ON_STREAM_HRS** para o poço offshore do projeto Volve é de **23,6488 horas/dia**.
+A média de horas em operação/produzindo no dia registrada no dataset Volve foi de:
 
-> **ON_STREAM_HRS** representa a quantidade de horas em que o poço esteve em operação/produzindo ao longo de cada dia. O valor médio de **23,65 horas/dia** indica um alto fator de utilização operacional do poço ao longo do período analisado, próximo ao máximo teórico de 24 horas diárias.
+| Métrica | Valor | Unidade |
+|---|---|---|
+| **avg_on_stream_hrs** | **23,6488** | **horas** |
+
+> **Interpretação técnica:** Em média, os equipamentos/poços permaneceram aproximadamente **23,65 horas por dia** em regime de produção, indicando um alto fator de utilização diário, próximo ao máximo teórico de 24 horas/dia.
 
 ---
 
 ### Caso de Teste 4: Em qual data ocorreu a maior AVG_DOWNHOLE_PRESSURE e qual foi o valor?
-- Tempo Total: 72.39 segundos
-- Tempo de Geração do SQL: 52.30 segundos
-- Tempo de Execução SQL: 0.00 segundos
-- Tempo de Resposta Remota: 20.05 segundos
-- Tamanho do Prompt Local Enviado: 22673 caracteres
-- Tamanho do Prompt Remoto Enviado: 20812 caracteres
+- Tempo Total: 3.16 segundos
+- Tempo de Geração do SQL: 0.00 segundos
+- Tempo de Execução SQL: 0.01 segundos
+- Tempo de Resposta Remota: 3.12 segundos
+- Tamanho do Prompt Local Enviado: 0 caracteres
+- Tamanho do Prompt Remoto Enviado: 1500 caracteres
 - Tentativas de Correção (Retries): 0
 - Status: Sem erros
 
 ```sql
-SELECT DATEPRD, AVG_DOWNHOLE_PRESSURE AS max_avg_downhole_pressure FROM volve_ml_ready ORDER BY AVG_DOWNHOLE_PRESSURE DESC LIMIT 1
+SELECT DATEPRD, AVG_DOWNHOLE_PRESSURE FROM volve_ml_ready ORDER BY AVG_DOWNHOLE_PRESSURE DESC LIMIT 1
 ```
 
 ```text
-   DATEPRD  max_avg_downhole_pressure
-2014-11-24                 229.949538
+   DATEPRD  AVG_DOWNHOLE_PRESSURE
+2014-11-24             229.949538
 ```
 
 > ## Maior AVG_DOWNHOLE_PRESSURE Registrada
 
-A maior **AVG_DOWNHOLE_PRESSURE** ocorreu em **24/11/2014**, com valor de **229,95 bar(a)**, medida pelo gauge de fundo do poço, próximo à zona produtora.
+A maior pressão média no fundo do poço (**AVG_DOWNHOLE_PRESSURE**) ocorreu em:
+
+| DATEPRD | AVG_DOWNHOLE_PRESSURE |
+|---|---|
+| **2014-11-24** | **229,949538 bar(a)** |
+
+**Data:** 24 de novembro de 2014
+**Valor:** 229,949538 bar(a)
 
 ---
 
 ### Caso de Teste 5: Qual foi o maior valor de water_cumulative e em qual data ocorreu?
-- Tempo Total: 39.43 segundos
-- Tempo de Geração do SQL: 34.22 segundos
-- Tempo de Execução SQL: 0.00 segundos
-- Tempo de Resposta Remota: 5.17 segundos
-- Tamanho do Prompt Local Enviado: 22669 caracteres
-- Tamanho do Prompt Remoto Enviado: 20793 caracteres
+- Tempo Total: 4.44 segundos
+- Tempo de Geração do SQL: 0.00 segundos
+- Tempo de Execução SQL: 0.01 segundos
+- Tempo de Resposta Remota: 4.41 segundos
+- Tamanho do Prompt Local Enviado: 0 caracteres
+- Tamanho do Prompt Remoto Enviado: 1543 caracteres
 - Tentativas de Correção (Retries): 0
 - Status: Sem erros
 
 ```sql
-SELECT DATEPRD, MAX(water_cumulative) AS max_water_cumulative FROM volve_ml_ready
+SELECT DATEPRD, water_cumulative FROM volve_ml_ready ORDER BY water_cumulative DESC LIMIT 1
 ```
 
 ```text
-   DATEPRD  max_water_cumulative
-2015-06-26               96037.2
+   DATEPRD  water_cumulative
+2015-06-26           96037.2
 ```
 
-> ## Resultado: Maior valor de `water_cumulative`
+> ## Maior Valor de `water_cumulative`
 
-O maior valor registrado de **water_cumulative** foi de **96.037,2 Sm³ acumulados**, ocorrido na data **2015-06-26** (26 de junho de 2015).
+O maior valor registrado de **`water_cumulative`** foi:
 
-> `water_cumulative` representa o acumulado histórico da série de água produzida (derivada de `BORE_WAT_VOL`), expresso em **Sm³ acumulado**.
+| `DATEPRD` | `water_cumulative` |
+|---|---|
+| **2015-06-26** | **96.037,2 Sm³ acumulado** |
+
+---
+
+**Interpretação técnica:**
+O acumulado histórico de água produzida atingiu seu valor máximo de **96.037,2 Sm³** na data de **26 de junho de 2015**, representando o pico do volume cumulativo de água ao longo de toda a série histórica disponível no dataset Volve.
 
 ---
 
 ### Caso de Teste 6: Qual foi o maior valor de oil_roll_30 e em qual data ocorreu?
-- Tempo Total: 49.26 segundos
-- Tempo de Geração do SQL: 43.82 segundos
+- Tempo Total: 3.23 segundos
+- Tempo de Geração do SQL: 0.00 segundos
 - Tempo de Execução SQL: 0.00 segundos
-- Tempo de Resposta Remota: 5.43 segundos
-- Tamanho do Prompt Local Enviado: 22664 caracteres
-- Tamanho do Prompt Remoto Enviado: 20773 caracteres
+- Tempo de Resposta Remota: 3.21 segundos
+- Tamanho do Prompt Local Enviado: 0 caracteres
+- Tamanho do Prompt Remoto Enviado: 1494 caracteres
 - Tentativas de Correção (Retries): 0
 - Status: Sem erros
 
 ```sql
-SELECT DATEPRD, MAX(oil_roll_30) AS max_oil_roll_30 FROM volve_ml_ready ORDER BY oil_roll_30 DESC LIMIT 1
+SELECT DATEPRD, oil_roll_30 FROM volve_ml_ready ORDER BY oil_roll_30 DESC LIMIT 1
 ```
 
 ```text
-   DATEPRD  max_oil_roll_30
-2014-06-08       733.144333
+   DATEPRD  oil_roll_30
+2014-06-08   733.144333
 ```
 
-> ## Resultado: Maior valor de `oil_roll_30`
+> ## Maior Valor de `oil_roll_30`
 
-O maior valor registrado para a feature **`oil_roll_30`** (média móvel de 30 dias da produção de óleo, derivada de `BORE_OIL_VOL`) foi:
+O maior valor registrado da feature rolling de 30 dias aplicada à série de óleo foi:
 
-| DATEPRD | max_oil_roll_30 |
-|---|---|
-| **2014-06-08** | **733,14 Sm³/d** |
+| DATEPRD | oil_roll_30 |
+|------------|-------------|
+| 2014-06-08 | **733,14 Sm³/d** |
 
-**Conclusão técnica:** O pico da média móvel de 30 dias da produção de óleo ocorreu em **08 de junho de 2014**, atingindo **733,144333 Sm³/d**, representando o período de maior desempenho médio sustentado de produção de óleo no histórico analisado do poço Volve.
+**Conclusão:** O pico da média móvel de 30 dias da produção de óleo atingiu **733,144333 Sm³/d** na data de **08 de junho de 2014**.
 
 ---
 
@@ -280,11 +299,11 @@ O maior valor registrado para a feature **`oil_roll_30`** (média móvel de 30 d
 - Total de Perguntas Submetidas: 6
 - Casos com sucesso: 6
 - Casos com falha: 0
-- Tempo Total de Varredura: 298.99 segundos
-- Média de Tempo por Requisição: 49.83 segundos
-- Média de Tempo de Geração do SQL: 41.83 segundos
+- Tempo Total de Varredura: 23.99 segundos
+- Média de Tempo por Requisição: 4.00 segundos
+- Média de Tempo de Geração do SQL: 0.00 segundos
 - Média de Tempo de Execução SQL: 0.00 segundos
-- Média de Tempo de Resposta Remota: 7.96 segundos
-- Média de Tamanho do Prompt Local: 22661.83 caracteres
-- Média de Tamanho do Prompt Remoto: 20752.50 caracteres
+- Média de Tempo de Resposta Remota: 3.97 segundos
+- Média de Tamanho do Prompt Local: 0.00 caracteres
+- Média de Tamanho do Prompt Remoto: 1467.33 caracteres
 - Status Geral do Sistema: Concluído com sucesso
