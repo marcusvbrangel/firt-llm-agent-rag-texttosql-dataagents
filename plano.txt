@@ -84,7 +84,113 @@ exibição transparente de pergunta, SQL, resultado e resposta final.
 
 
 
+--------------------------------------
+
+
+Eu seguiria uma melhora em 4 etapas, nessa ordem.
+
+1. Primeiro: medir melhor
+Hoje o relatório só mostra tempo total por pergunta. Isso é pouco.
+
+Eu colocaria no notebook:
+
+sql_generation_time
+sql_execution_time
+remote_response_time
+total_time
+tamanho do prompt local
+tamanho do prompt remoto
+Isso vai mostrar imediatamente onde está o problema real. Pelo relatório atual, o gargalo parece estar no modelo local em alguns casos, não no SQLite.
+
+2. Depois: estabilizar o SQL
+Aqui está o maior ganho com pouco esforço.
+
+Eu faria:
+
+regra obrigatória para max/min + data: usar ORDER BY ... DESC/ASC LIMIT 1
+alias obrigatório em agregações
+pós-validador simples do SQL gerado
+rejeitar padrões ruins como SELECT DATEPRD, MAX(...) LIMIT 1
+se o SQL vier ruim, fazer uma única reescrita automática
+Isso melhora:
+
+correção
+consistência
+legibilidade do resultado
+qualidade da resposta remota
+3. Em seguida: melhorar a resposta remota com contexto certo
+Você está certo: o modelo remoto precisa entender produção de petróleo e séries temporais.
+
+Mas eu faria isso de forma controlada:
+
+mandar para o modelo remoto o DATA_DICTIONARY
+mandar também só o recorte das colunas retornadas
+instruir explicitamente:
+use unidade correta
+não use “unidade conforme coluna”
+explique se a coluna é volume diário, pressão, acumulado, rolling, lag, delta, pct_change, zscore
+diferencie variável medida de feature derivada
+Ponto importante:
+
+eu não mandaria o super dicionário completo para o modelo local em versão gigante para sempre
+para o local, prefiro um contexto mais compacto e operacional
+para o remoto, aí sim faz sentido um contexto semântico mais rico
+4. Por fim: melhorar o relatório
+O relatório ainda está informando pouco para depuração.
+
+Eu adicionaria:
+
+tempo por etapa
+padrão do SQL usado
+colunas retornadas
+unidade usada na resposta final
+número de linhas retornadas
+flag de empate no máximo/mínimo
+flag de consulta simples vs derivada
+observação se a resposta remota usou unidade correta ou genérica
+O que eu não faria agora
+
+não mexeria em Streamlit
+não trocaria de modelo ainda
+não faria fine-tuning
+não criaria uma arquitetura grande
+não tentaria “ganhar medalha de ouro” com otimização avançada
+Ordem prática que eu recomendo
+
+Instrumentação de tempo por etapa.
+Guardrails e pós-validação do SQL.
+Melhorar prompt remoto com dicionário + contexto das colunas retornadas.
+Melhorar o relatório com métricas de qualidade.
 
 
 
+--------------------------------------
 
+observabilidade com LangSmith
+
+--------------------------------------
+
+criar 10 perguntas de alto nivel em cima de series temporais
+
+--------------------------------------
+
+usar modelo 3b ????
+
+--------------------------------------
+
+comentar os blocos de codigos do mesmo grupo de contexto;
+comentar linhas de codigos
+
+
+--------------------------------------
+
+colocar debugues em pontos chaves (metodos do codigo)
+
+
+--------------------------------------
+
+deixar o codigo mais legivel, com menos sintaxes/comandos complexos demais
+e mais passo a passo, evitando comando dentro de comando
+
+
+--------------------------------------
