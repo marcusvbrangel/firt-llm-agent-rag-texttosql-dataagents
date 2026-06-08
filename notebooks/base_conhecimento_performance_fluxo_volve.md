@@ -108,3 +108,148 @@ Se a execucao for interrompida antes do fim do loop, o relatorio final pode nao 
 - medir novamente os 6 casos apos as mudancas;
 - se ainda houver demora alta, testar `qwen2.5-coder:3b-instruct`;
 - se a interrupcao humana continuar frequente, salvar relatorio incremental apos cada caso.
+
+## Ajustes aplicados ate aqui
+
+### Ajuste 1
+
+Reducao forte do contexto enviado ao modelo local.
+
+Objetivo:
+
+- parar de mandar dicionario completo em toda pergunta;
+- focar nas colunas mais relevantes para cada caso.
+
+### Ajuste 2
+
+Reducao do budget de geracao local.
+
+Aplicacao:
+
+- `LOCAL_SQL_NUM_PREDICT=80`
+
+### Ajuste 3
+
+Normalizacao do SQL gerado.
+
+Objetivo:
+
+- remover alias ruins em colunas base;
+- preservar o nome original das colunas medidas;
+- melhorar o contrato semantico com a etapa remota.
+
+### Ajuste 4
+
+Mapeamento entre alias e coluna de origem.
+
+Objetivo:
+
+- fazer a resposta remota entender corretamente unidade e significado da coluna;
+- reduzir interpretacoes erradas por parte do modelo remoto.
+
+### Ajuste 5
+
+Criacao de `fast path` deterministico para perguntas simples.
+
+Objetivo:
+
+- tirar perguntas triviais do caminho do `Ollama`;
+- reduzir custo de tempo onde nao ha necessidade de inferencia generativa.
+
+## Resultado importante ja obtido
+
+Em uma rodada validada de perguntas simples:
+
+- 6 de 6 perguntas tiveram sucesso;
+- media aproximada de 4 segundos por pergunta;
+- tempo de geracao de SQL praticamente zerado nesses casos;
+- prompt remoto ficou muito menor do que no fluxo antigo.
+
+## Historico dos nossos sofrimentos
+
+### Sofrimento 1 - Interrupcao por demora excessiva
+
+Fato observado:
+
+- a execucao foi interrompida manualmente depois de cerca de 10 minutos;
+- o `KeyboardInterrupt` ocorreu no meio do `ollama_client.chat(...)`.
+
+Licao:
+
+- antes de pensar em trocar banco ou reescrever tudo, era necessario confirmar o gargalo real;
+- o gargalo real foi a etapa local de SQL.
+
+### Sofrimento 2 - Tentar resolver tudo com a mesma trilha
+
+Problema:
+
+- perguntas simples, analiticas e preditivas estavam pressionando a mesma arquitetura `pergunta -> SQL -> resposta`;
+- isso fez o sistema parecer mais geral do que realmente era.
+
+Licao:
+
+- historico e previsao nao devem ser tratados como o mesmo tipo de problema.
+
+### Sofrimento 3 - Culpar o prompt remoto pela coisa errada
+
+Problema potencial:
+
+- havia risco de aumentar novamente o prompt remoto toda vez que a qualidade caia.
+
+Conclusao consolidada:
+
+- a qualidade remota nao deve ser corrigida primeiro por aumento de contexto;
+- a primeira suspeita deve ser contexto ruim vindo do SQL local.
+
+### Sofrimento 4 - Perguntas irreais de avaliacao
+
+Problema:
+
+- parte das perguntas de teste usava nomes de colunas e formulas como se um operador falasse em linguagem de banco.
+
+Impacto:
+
+- o teste ficou artificial;
+- a avaliacao deixou de representar linguagem natural de engenharia de producao.
+
+Licao:
+
+- perguntas precisam ser operacionais e naturais;
+- schema e formulas devem ficar dentro do sistema.
+
+## Erros e desafios ainda abertos
+
+### Desafio 1
+
+Perguntas historicas analiticas ainda podem exigir demais do modelo local quando nao existe template nem `fast path`.
+
+### Desafio 2
+
+Perguntas de previsao continuam sendo o ponto de maior risco arquitetural se forem tratadas como extensao do `text-to-sql`.
+
+### Desafio 3
+
+O dataset atual tem cerca de 125 linhas, o que exige muita disciplina antes de adotar `XGBoost` como solucao principal.
+
+### Desafio 4
+
+O notebook ainda concentra responsabilidades demais:
+
+- acesso a dados;
+- definicao de schema;
+- geracao de SQL;
+- execucao;
+- resposta final;
+- relatorio.
+
+## Virada arquitetural registrada
+
+Ficou consolidado que:
+
+- `SQL` deve responder passado, exploracao, relatorios, comparacoes e graficos;
+- `ML` deve responder previsao, tendencia futura, risco e mudanca de regime;
+- `LLM` deve servir como camada de interface, roteamento e explicacao.
+
+Documento principal dessa virada:
+
+- `plano-tecnico-consultas-sql-versus-machine-learning.md`

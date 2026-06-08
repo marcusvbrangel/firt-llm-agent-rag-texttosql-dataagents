@@ -1,6 +1,6 @@
 # Base de Conhecimento Local
 
-Ultima consolidacao: 2026-06-07
+Ultima consolidacao: 2026-06-08
 
 ## Objetivo
 
@@ -13,8 +13,12 @@ Arquivos principais envolvidos:
 - `notebooks/05-exercicio-open-router.ipynb`
 - `notebooks/05-exercicio-open-router-corrigido.ipynb`
 - `notebooks/06-exercicio-modelo-local-e-remoto.ipynb`
+- `notebooks/07-exercicio-dados-reais-producao-volve-noruega.ipynb`
 - `notebooks/relatorio_estresse.md`
 - `notebooks/relatorio_modelo_local_e_remoto.md`
+- `notebooks/relatorio_dados_reais_producao_volve_noruega.md`
+- `notebooks/base_conhecimento_performance_fluxo_volve.md`
+- `plano-tecnico-consultas-sql-versus-machine-learning.md`
 
 ## Dependencias e Ambiente
 
@@ -386,3 +390,97 @@ Prevencao:
 - Modelo correto e nome correto sao parte critica da estabilidade.
 - SQL local + resposta final remota e uma boa estrategia para reduzir credito e manter qualidade.
 - Sem registro de causa raiz, o projeto tende a repetir os mesmos erros.
+
+## Consolidacao Volve - 2026-06-08
+
+### 1. Sofrimento principal confirmado
+
+No caso Volve, o sofrimento tecnico principal nao estava no `SQLite`. O gargalo dominante passou a ser a etapa local de geracao de SQL com `Ollama`, especialmente quando o sistema tentava responder perguntas de series temporais mais sofisticadas usando a mesma trilha de perguntas simples.
+
+### 2. Diagnostico correto da queda de qualidade
+
+Foi consolidada uma diretriz importante:
+
+- manter o prompt remoto reduzido;
+- nao culpar automaticamente a reducao do prompt remoto por qualquer perda de qualidade;
+- tratar a qualidade do contexto local como suspeita principal.
+
+Em outras palavras:
+
+- se a resposta remota piorar, a primeira investigacao deve recair sobre SQL, aliases, metadados retornados e contexto enviado ao modelo remoto.
+
+### 3. Ajustes efetivamente aplicados no notebook 07
+
+Os principais ajustes feitos no fluxo Volve foram:
+
+- contexto local enxuto por pergunta;
+- reducao de `LOCAL_SQL_NUM_PREDICT` para `80`;
+- normalizacao do SQL gerado;
+- preservacao de nomes de colunas base sem alias desnecessario;
+- mapeamento entre alias e coluna de origem;
+- `fast path` deterministico para perguntas simples de maximo, minimo e media.
+
+Esses ajustes reduziram latencia e melhoraram a consistencia sem precisar inflar novamente o prompt remoto.
+
+### 4. Resultado tecnico importante obtido
+
+Em uma rodada validada de perguntas simples:
+
+- 6 de 6 casos tiveram sucesso;
+- a media ficou por volta de 4 segundos por pergunta;
+- a geracao de SQL ficou praticamente zerada nesses casos por causa do `fast path`;
+- o prompt remoto ficou muito menor do que nas execucoes antigas.
+
+### 5. Erro de avaliacao descoberto
+
+Foi identificado um erro importante no desenho das perguntas de teste:
+
+- perguntas estavam centradas em nomes de colunas e formulas;
+- esse estilo nao representa a linguagem de um engenheiro de producao ou operador;
+- o teste passou a medir familiaridade com schema, e nao aderencia a linguagem natural operacional.
+
+Licao consolidada:
+
+- perguntas de usuario real devem ser escritas em linguagem natural operacional;
+- nomes de colunas devem ficar escondidos dentro do sistema.
+
+### 6. Mudanca de direcao arquitetural
+
+Foi consolidada uma conclusao mais estrutural:
+
+- continuar tentando empurrar perguntas de previsao para dentro da trilha `linguagem natural -> SQL` consumiria muito tempo com retorno tecnico ruim;
+- perguntas historicas e analiticas devem permanecer na trilha `SQL`;
+- perguntas de previsao, tendencia futura, risco e mudanca de regime devem migrar para uma trilha `ML`.
+
+Essa virada gerou o documento:
+
+- `plano-tecnico-consultas-sql-versus-machine-learning.md`
+
+### 7. Regra nova de arquitetura
+
+Separacao recomendada a partir deste ponto:
+
+- `SQL` para passado, exploracao, filtros, ranking, graficos e relatorios;
+- `ML` para previsao de `D+1`, `D+3`, tendencia futura, risco e mudanca de regime;
+- `LLM` para classificar intencao, rotear e explicar.
+
+### 8. Desafios que permanecem abertos
+
+- tirar a orquestracao principal de dentro do notebook;
+- criar `router` de intencao confiavel;
+- montar baselines de forecast antes de testar `XGBoost`;
+- validar se um dataset com cerca de 125 linhas sustenta previsoes uteis de curto prazo;
+- construir uma aplicacao Streamlit sem misturar responsabilidades.
+
+## Regra de Memoria do Projeto
+
+Este projeto nao deve guardar apenas a versao final das solucoes. A base de conhecimento precisa registrar:
+
+- tentativas ruins;
+- erros de arquitetura;
+- interrupcoes;
+- causas raiz;
+- mudancas de direcao;
+- e os sofrimentos tecnicos que levaram as decisoes atuais.
+
+Sem esse historico, o projeto tende a repetir o mesmo custo em ciclos futuros.
