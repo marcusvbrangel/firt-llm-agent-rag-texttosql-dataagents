@@ -46,3 +46,35 @@ V6
 LangGraph Multi-Agent
 
 
+
+
+
+
+
+
+
+
+
+chama o modelo para gerar o SQL
+executa o SQL localmente
+chama o modelo de novo para redigir a resposta final
+
+
+
+quero usar um modelo local na minha maquina (offile) para gerar o SQL e executa o SQL localmente... e continuar usando o modelo "anthropic/claude-sonnet-4.6" (openrounter) para redigir a resposta final....
+para execução local.... qual o modelo com o melhor custo beneficio (performance e qualidade de processamento)?  qwen coder ou llama?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
