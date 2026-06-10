@@ -1,6 +1,6 @@
 # Base de Conhecimento - Performance do Fluxo Volve
 
-**Ultima atualizacao:** 2026-06-08
+**Ultima atualizacao:** 2026-06-10
 
 ## Problema
 
@@ -253,3 +253,169 @@ Ficou consolidado que:
 Documento principal dessa virada:
 
 - `plano-tecnico-consultas-sql-versus-machine-learning.md`
+
+## Atualizacao operacional - Notebook 09 - 2026-06-10
+
+### O que virou verdade tecnica no notebook 09
+
+O `notebooks/09-exercicio.ipynb` consolidou uma trilha remota mais barata e mais observavel:
+
+- SQL remoto via `deepseek/deepseek-chat`
+- resposta final remota via `google/gemini-2.5-flash`
+- banco local `SQLite` em modo somente leitura
+- contexto SQL com ordem preparada para favorecer caching estrutural
+- resposta final curta e operacional
+- instrumentacao de tempo e tamanho de contexto
+
+### Configuracao oficial dos modelos
+
+No notebook 09, a configuracao oficial deve ficar no topo e sem camadas intermediarias:
+
+- `REMOTE_SQL_MODEL = "deepseek/deepseek-chat"`
+- `REMOTE_TEXT_MODEL = "google/gemini-2.5-flash"`
+
+Regra de manutencao:
+
+- se o usuario quiser trocar modelos, a mudanca deve acontecer somente nessas duas linhas;
+- o restante do notebook deve consumir exatamente essas variaveis.
+
+### Causa raiz de uma falha cara que foi eliminada
+
+Foi confirmado que a primeira tentativa de SQL falhava por inducao do proprio contexto:
+
+- o few-shot usava `oil_roll_mean_30`;
+- a coluna existente na base e `oil_roll_30`.
+
+Impacto:
+
+- falha em `SQLite`;
+- segunda chamada paga ao modelo;
+- aumento de latencia;
+- ruido na avaliacao.
+
+Regra consolidada:
+
+- qualquer ajuste futuro em exemplos de prompt deve ser conferido contra o schema real da tabela `volve_ml_ready`.
+
+### Perguntas de teste deixaram de ser artificiais
+
+O banco de perguntas foi reescrito para linguagem humana de operador.
+
+Antes:
+
+- perguntas citavam nomes de colunas SQL;
+- a avaliacao era artificial.
+
+Agora:
+
+- perguntas falam em producao, pressao de fundo, horas em operacao, risco de agua, oscilacao e instabilidade;
+- o sistema interno faz o mapeamento para colunas e indicadores.
+
+Licao:
+
+- schema pertence ao sistema;
+- linguagem operacional pertence ao usuario.
+
+### Contrato novo da resposta final
+
+A resposta final do notebook 09 deve obedecer ao seguinte contrato:
+
+- primeira linha em formato `Diagnóstico: ...`
+- no maximo 2 paragrafos curtos depois disso
+- sem saudacao
+- sem tom de relatorio executivo
+- sem bloco de codigo
+- se houver tabela, ela deve ser compacta
+- se houver recomendacao, ela deve ser concreta e operacional
+
+### Ajuste importante no contexto da resposta
+
+Os dados enviados ao modelo final passaram a ser formatados para leitura humana.
+
+Exemplo importante:
+
+- `oil_pct_change_1d = 0.15129` deve entrar como `15.13%`
+
+Motivo:
+
+- reduz ambiguidade;
+- melhora a qualidade da resposta;
+- evita que o operador veja um valor fracionario cru que exige interpretacao.
+
+### Instrumentacao obrigatoria do fluxo
+
+O notebook 09 passou a carregar rastros internos com dois interruptores:
+
+- `DEBUG_METHOD_TRACE = True`
+- `TRACE_OPERATION_METRICS = True`
+
+Esses rastros passaram a ser parte do desenho do sistema, nao detalhe opcional.
+
+O que medir a partir deles:
+
+1. tempo total do pipeline
+2. tempo de geracao do SQL
+3. tempo de execucao do SQLite
+4. tempo da resposta remota
+5. tamanho do prompt SQL
+6. tamanho do prompt da resposta final
+7. tamanho do SQL gerado
+8. tamanho da resposta final
+
+### Leitura correta dos rastros
+
+Se o custo ou a latencia piorarem, investigar nesta ordem:
+
+1. se o prompt SQL cresceu demais
+2. se o contexto da resposta final cresceu demais
+3. se houve retry por erro de schema
+4. se o SQL remoto ficou mais verboso ou menos disciplinado
+5. se a resposta final voltou a ficar explicativa demais
+
+### Regra de log confiavel
+
+Foi corrigido um erro de observabilidade:
+
+- o log dizia `Claude` mesmo quando o modelo ativo era outro.
+
+Regra nova:
+
+- log deve sempre refletir `REMOTE_SQL_MODEL` ou `REMOTE_TEXT_MODEL` reais;
+- diagnostico por log so vale se o log disser a verdade.
+
+### Regra de apresentacao terminal
+
+Antes da resposta final impressa ao usuario, o notebook agora emite uma linha separadora.
+
+Motivo:
+
+- separar rastros tecnicos de mensagem operacional;
+- melhorar legibilidade em execucao terminal.
+
+### Regra de higiene do arquivo ipynb
+
+Para preservar leitura e versionamento:
+
+- limpar `outputs`
+- zerar `execution_count`
+- nao commitar residuos de respostas antigas dentro do notebook
+
+### Checklist de manutencao futura do notebook 09
+
+Sempre que houver mudanca relevante:
+
+1. validar o JSON do notebook
+2. extrair a celula e compilar o codigo
+3. checar se os modelos do topo ainda sao os usados de fato
+4. verificar se o few-shot continua alinhado ao schema real
+5. rodar pelo menos uma pergunta real e observar os traces
+
+### Regra final de paz
+
+Para manter o notebook 09 barato, confiavel e menos sofrido:
+
+- nao reintroduzir nomes de colunas errados no contexto;
+- nao deixar a resposta final crescer sem necessidade;
+- nao voltar a escrever perguntas como se o usuario fosse DBA;
+- nao aceitar logs mentirosos;
+- nao discutir custo sem olhar tempo e tamanho de contexto.

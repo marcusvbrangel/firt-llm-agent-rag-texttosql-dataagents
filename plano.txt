@@ -189,7 +189,9 @@ colocar debugues em pontos chaves (metodos do codigo)
 
 --------------------------------------
 
-
+Gostaria de ver como estruturar os exemplos de poucas tentativas (few-shot) 
+dentro dessa mesma classe OpenRouterVanna para fixar queries complexas e garantir 99% de acerto 
+nas buscas dos operadores?
 
 --------------------------------------
 

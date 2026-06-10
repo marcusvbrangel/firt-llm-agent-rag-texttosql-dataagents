@@ -484,3 +484,197 @@ Este projeto nao deve guardar apenas a versao final das solucoes. A base de conh
 - e os sofrimentos tecnicos que levaram as decisoes atuais.
 
 Sem esse historico, o projeto tende a repetir o mesmo custo em ciclos futuros.
+
+## Consolidacao Volve - Notebook 09 - 2026-06-10
+
+### Escopo consolidado
+
+O `notebooks/09-exercicio.ipynb` passou a ser tratado como o notebook principal do fluxo remoto `Text-to-SQL -> SQLite -> Resposta final` para o caso Volve.
+
+Ele deixou de ser apenas um experimento e passou a concentrar regras operacionais importantes de:
+
+- carregamento do banco `volve_ml_ready.db`;
+- geracao remota de SQL;
+- execucao segura em `SQLite`;
+- resposta final remota em linguagem natural;
+- medicao de custo indireto via tamanho de contexto e tempo.
+
+### Configuracao de modelos que virou regra
+
+No notebook 09, a configuracao oficial e visivel no topo e deve continuar assim:
+
+- `REMOTE_SQL_MODEL = "deepseek/deepseek-chat"`
+- `REMOTE_TEXT_MODEL = "google/gemini-2.5-flash"`
+
+Regra consolidada:
+
+- todo o notebook deve consumir apenas essas duas variaveis;
+- evitar cadeias intermediarias de configuracao para nao gerar duvida sobre qual modelo esta realmente ativo;
+- quando o usuario quiser testar outros modelos, a troca deve acontecer no topo do notebook e em nenhum outro ponto.
+
+### Correcao estrutural importante de schema
+
+Foi confirmado um erro que gerava custo desnecessario:
+
+- o contexto de few-shot induzia o modelo a usar `oil_roll_mean_30`;
+- a coluna correta da tabela `volve_ml_ready` e `oil_roll_30`.
+
+Consequencia observada:
+
+- a primeira tentativa de SQL falhava;
+- o pipeline chamava o modelo novamente;
+- custo e latencia aumentavam sem necessidade.
+
+Regra consolidada:
+
+- nunca deixar nome de coluna inexistente em `few_shot_examples`, `QUESTION_KEYWORD_HINTS` ou banco interno de perguntas;
+- antes de afirmar que o modelo "errou", checar se o proprio contexto do notebook nao esta ensinando coluna errada.
+
+### Caching estrutural do prompt SQL
+
+Foi consolidada a seguinte regra para o `build_sql_prompt`:
+
+- `schema_text` e `few_shot_examples` devem aparecer no inicio do prompt;
+- pergunta do usuario, contexto semantico local e historico de erro devem ficar mais ao final.
+
+Motivo:
+
+- isso favorece cache estrutural no provedor remoto;
+- reduz custo de leitura em repeticoes;
+- estabiliza a trilha de entrada quando varias perguntas sao executadas no mesmo formato.
+
+### Contencao de custo de saida
+
+O fluxo antigo gerava respostas longas, caras e pouco adequadas para operacao.
+
+Foi consolidado que a resposta final deve:
+
+- ser curta;
+- com foco operacional;
+- sem tom de livro, relatorio executivo ou parecer academico;
+- com teto aproximado de 250 a 300 palavras;
+- com no maximo 2 paragrafos curtos apos a linha inicial de diagnostico.
+
+### Mudanca de estilo da resposta final
+
+Foi consolidado que o destinatario e um operador de producao, nao um executivo e nao um DBA.
+
+Regra nova do notebook 09:
+
+- a resposta deve comecar com `Diagnóstico:`;
+- nao usar saudacoes como `Prezado Operador`;
+- usar linguagem de sala de controle;
+- separar fato observado de hipotese operacional;
+- se houver recomendacao, ela deve citar verificacoes concretas como `choke`, `pressao de fundo`, `instabilidade de fluxo`, `intervencao recente` ou `qualidade da medicao`.
+
+### Humanizacao das perguntas de teste
+
+Foi confirmado que perguntas com nomes de colunas produziam uma avaliacao artificial.
+
+Mudanca consolidada:
+
+- as 12 perguntas do banco interno foram reescritas em linguagem humana;
+- os nomes tecnicos de colunas ficaram escondidos dentro do sistema;
+- `QUESTION_KEYWORD_HINTS` foi ampliado para termos operacionais como `pressao de fundo`, `horas em operacao`, `fora do padrao`, `avanco de agua`, `ritmo de producao` e `instabilidade mecanica`.
+
+Licao:
+
+- o teste deve medir entendimento de linguagem operacional;
+- nao deve medir se o usuario sabe o schema do banco.
+
+### Sorteio de pergunta
+
+Ficou consolidado que o notebook pode sortear automaticamente uma pergunta do banco interno com `np.random.choice`.
+
+Regra:
+
+- isso e util para testes de variacao;
+- mas quando houver debug de um caso especifico, a pergunta deve ser fixada explicitamente para reproducibilidade.
+
+### Formato de dados enviado ao LLM de resposta
+
+Foi consolidado um ajuste importante:
+
+- percentuais fracionarios devem ser formatados para leitura humana antes de entrar no prompt final.
+
+Exemplo:
+
+- `0.15129` deve aparecer como `15.13%` no contexto do modelo de resposta.
+
+Motivo:
+
+- reduz ambiguidade;
+- evita que o modelo precise inferir se o valor e fracao ou percentual;
+- melhora a clareza para o operador.
+
+### Observabilidade e telemetria interna
+
+O notebook 09 passou a ter dois mecanismos internos de rastreabilidade:
+
+- `DEBUG_METHOD_TRACE = True`
+- `TRACE_OPERATION_METRICS = True`
+
+O que isso registra:
+
+- entrada em cada metodo relevante;
+- finalidade de cada metodo;
+- tempo de execucao por metodo instrumentado;
+- tamanho do contexto de entrada e saida nas etapas de SQL e resposta final;
+- tempos separados de geracao SQL, execucao SQLite e resposta remota;
+- resumo final do pipeline com caracteres de entrada e saida.
+
+Regra consolidada:
+
+- nao remover essa instrumentacao sem substituir por algo equivalente;
+- ela virou a base objetiva para discutir custo, latencia e regressao.
+
+### Regra de log correto
+
+Foi corrigido um erro de observabilidade:
+
+- o log ainda dizia `Query gerada pelo Claude` mesmo quando o modelo ativo nao era Claude.
+
+Regra consolidada:
+
+- logs devem sempre imprimir a variavel real do modelo ativo;
+- nomes legados em log geram diagnostico falso e confundem comparacoes de teste.
+
+### Regra de apresentacao final
+
+Foi adicionada uma linha separadora antes da resposta final impressa ao usuario.
+
+Motivo:
+
+- separar os logs tecnicos da resposta operacional;
+- facilitar leitura no terminal;
+- reduzir confusao entre rastreamento interno e mensagem final.
+
+### Regra de higiene do notebook
+
+Foi consolidado um cuidado operacional importante:
+
+- manter `outputs` limpos;
+- manter `execution_count` nulo antes de salvar o notebook quando o objetivo for versionamento limpo;
+- nao deixar respostas antigas persistidas porque elas poluem a leitura, confundem validacao e mantem lixo historico dentro do `.ipynb`.
+
+### Validacoes minimas obrigatorias apos alteracao no notebook 09
+
+Sempre que o notebook 09 for alterado, executar no minimo:
+
+1. validacao estrutural do JSON do notebook;
+2. compilacao do codigo extraido da celula;
+3. checagem de que os modelos do topo sao os realmente usados;
+4. revisao de logs para confirmar o nome real do modelo;
+5. se a mudanca tocar prompt ou schema, testar pelo menos uma pergunta real do banco interno.
+
+### Regra de ouro para paz futura
+
+No caso Volve, quase todo sofrimento recente veio de 5 coisas:
+
+- contexto ensinando coluna errada;
+- resposta final grande demais para o caso de uso;
+- perguntas artificiais demais para o operador real;
+- log mentindo sobre o modelo ativo;
+- falta de medicao objetiva de tempo e tamanho de contexto.
+
+Se esses cinco pontos forem mantidos sob controle, o notebook 09 tende a permanecer previsivel, barato e auditavel.
