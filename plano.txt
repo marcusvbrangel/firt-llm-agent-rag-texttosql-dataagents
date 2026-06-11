@@ -200,6 +200,10 @@ nas buscas dos operadores?
 --------------------------------------
 
 
+LANGCHAIN_TRACING_V2=true
+LANGCHAIN_ENDPOINT="https://langchain.com"
+LANGCHAIN_API_KEY=
+LANGCHAIN_PROJECT="lab-artificial-inteligence"
 
 
 
